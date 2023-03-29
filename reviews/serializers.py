@@ -6,3 +6,12 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = "__all__"
+
+
+class TinyReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = (
+            "payload",
+            "rating",
+        )
