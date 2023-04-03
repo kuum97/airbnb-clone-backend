@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User
-from reviews.serializers import TinyReviewSerializer
+
+# from reviews.serializers import TinyReviewSerializer
 
 
 class TinyUserSerializer(serializers.ModelSerializer):
@@ -32,10 +33,10 @@ class PrivateUserSerializer(serializers.ModelSerializer):
 # 유저가 어떤 도시들을 여행했는지, 몇 개의 방을 가지고 있는지, 나에 대한 리뷰도 표시하는 시리얼라이저 만들기
 class PublicUserSerializer(serializers.ModelSerializer):
 
-    reviews = TinyReviewSerializer(
+    """reviews = TinyReviewSerializer(
         read_only=True,
         many=True,
-    )
+    )"""
 
     class Meta:
         model = User
