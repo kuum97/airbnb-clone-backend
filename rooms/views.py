@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.exceptions import (
     NotFound,
-    NotAuthenticated,
     ParseError,
     PermissionDenied,
 )
@@ -167,7 +166,7 @@ class RoomDetail(APIView):
                     for amenity_pk in amenities:
                         amenity = Amenity.objects.get(pk=amenity_pk)
                         room.amenities.add(amenity)
-                except Exception:
+                except Amenity.DoesNotExist:
                     raise ParseError("Amenity not found")
             if "category" in request.data:
                 category_pk = request.data.get("category")
