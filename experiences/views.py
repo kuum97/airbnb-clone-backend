@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import (
@@ -19,6 +20,7 @@ from .serializers import (
     ExperienceListSerializer,
     ExperienceDetailSerializer,
 )
+from bookings.serializers import ExperienceBookingSerializer
 
 
 class Perks(APIView):
@@ -183,8 +185,36 @@ class ExperienceBookings(APIView):
 
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def get_object(self, pk):
+        try:
+            return Experience.objects.get(pk=pk)
+        except Experience.DoesNotExist:
+            raise NotFound
+
     def get(self, request, pk):
-        pass
+        experience = self.get_object(pk)
+        now = timezone.localtime(timezone.now())
+        bookings = Booking.objects.filter(
+            experience=experience,
+            kind=Booking.BookingKindChoices.EXPERIENCE,
+            experience_time__gt=now,
+        )
+        serializer = ExperienceBookingSerializer(
+            bookings,
+            many=True,
+        )
+        return Response(serializer.data)
 
     def post(self, request, pk):
-        pass
+        experience = self.get_object(pk)
+        serializer = ExperienceBookingSerializer(data=request.data)
+        if serializer.is_valid():
+            booking = serializer.save(
+                experience=experience,
+                user=request.user,
+                kind=Booking.BookingKindChoices.EXPERIENCE,
+            )
+            serializer = ExperienceBookingSerializer(booking)
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

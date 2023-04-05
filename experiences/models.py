@@ -22,6 +22,9 @@ class Experience(CommonModel):
         on_delete=models.CASCADE,
         related_name="experiences",
     )
+    maximum_guests = models.IntegerField(
+        default=0,
+    )
     price = models.PositiveIntegerField()
     address = models.CharField(
         max_length=250,

@@ -27,10 +27,7 @@ from categories.models import Category
 from bookings.models import Booking
 from reviews.serializers import ReviewSerializer
 from medias.serializers import PhotoSerializer
-from bookings.serializers import (
-    PublicBookingSerializer,
-    CreateRoomBookingSerializer,
-)
+from bookings.serializers import RoomBookingSerializer
 
 
 class Amenities(APIView):
@@ -276,7 +273,7 @@ class RoomBookings(APIView):
             kind=Booking.BookingKindChoices.ROOM,
             check_in__gt=now,
         )
-        serializer = PublicBookingSerializer(
+        serializer = RoomBookingSerializer(
             bookings,
             many=True,
         )
@@ -284,14 +281,14 @@ class RoomBookings(APIView):
 
     def post(self, request, pk):
         room = self.get_object(pk)
-        serializer = CreateRoomBookingSerializer(data=request.data)
+        serializer = RoomBookingSerializer(data=request.data)
         if serializer.is_valid():
             booking = serializer.save(
                 room=room,
                 user=request.user,
                 kind=Booking.BookingKindChoices.ROOM,
             )
-            serializer = CreateRoomBookingSerializer(booking)
+            serializer = RoomBookingSerializer(booking)
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
